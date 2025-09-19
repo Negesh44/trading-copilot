@@ -1,4 +1,4 @@
-"pathway[xpack-llm]"
+pathway
 requests
 streamlit
 openai
