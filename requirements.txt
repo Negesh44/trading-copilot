@@ -1,5 +1,4 @@
 pathway
 requests
-streamlit
 openai
 python-dotenv
