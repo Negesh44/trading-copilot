@@ -25,7 +25,7 @@ def fetch_news_data(ticker):
     Simulates a real-time news stream for a given stock ticker.
     In a real application, this would connect to a live API.
     """
-    
+
     # Placeholder data for demonstration purposes
     data_map = {
         "AAPL": [
@@ -38,12 +38,23 @@ def fetch_news_data(ticker):
             {"title": "Google announces new powerful AI model", "content": "The company revealed a new, powerful AI model that could reshape the industry.", "timestamp": time.time() + 5}
         ]
     }
-    
+
+    # Check if the ticker exists in our data map
     if ticker.upper() in data_map:
-        return pw.io.json.read_data(data_map[ticker.upper()], mode="append")
+        data = data_map[ticker.upper()]
     else:
-        # Return an empty stream if ticker is not in our placeholder data
-        return pw.io.json.read_data([], mode="append")
+        # Provide an empty list to avoid the error
+        data = []
+
+    # Create a Pathway table from the in-memory list
+    return pw.new(
+        data=data,
+        schema_model=pw.Schema(
+            title=str,
+            content=str,
+            timestamp=float
+        )
+    )
 
 # 2. Dynamic RAG Core with Pathway (Backend)
 def create_rag_pipeline(ticker_stream):
@@ -111,14 +122,14 @@ if ticker:
         st.session_state.messages.append({"role": "user", "content": prompt})
         with st.chat_message("user"):
             st.markdown(prompt)
-        
+
         # Query the RAG pipeline
         response_stream = rag_pipeline.get_answer_as_streaming_response(
             prompt,
             api_key=OPENAI_API_KEY,
             model="gpt-4o-mini"
         )
-        
+
         full_response = ""
         with st.chat_message("assistant"):
             response_container = st.empty()
@@ -126,5 +137,5 @@ if ticker:
                 full_response += chunk.text
                 response_container.markdown(full_response + "▌") # Typing indicator
             response_container.markdown(full_response)
-        
+
         st.session_state.messages.append({"role": "assistant", "content": full_response})
