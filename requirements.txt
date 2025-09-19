@@ -1,0 +1,5 @@
+"pathway[xpack-llm]"
+requests
+streamlit
+openai
+python-dotenv
